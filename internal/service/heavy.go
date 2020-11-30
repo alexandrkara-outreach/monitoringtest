@@ -1,7 +1,11 @@
 package service
 
 import (
+	"context"
 	"math/big"
+	"strconv"
+
+	"github.com/honeycombio/beeline-go"
 
 	"github.com/alexandrkara-outreach/monitoringtest/internal/database"
 	"github.com/alexandrkara-outreach/monitoringtest/internal/monitoring"
@@ -24,17 +28,23 @@ func NewHeavy(db *database.DB, stats *monitoring.Stats) *Heavy {
 	}
 }
 
-func (h *Heavy) Compute() Result {
+func (h *Heavy) Compute(ctx context.Context) Result {
 	var r Result
-	r.Input = h.db.Load()
-	r.Factorial = h.factorial(big.NewInt(int64(r.Input)))
+	r.Input = h.db.Load(ctx)
+	r.Factorial = h.factorial(ctx, big.NewInt(int64(r.Input)))
 	return r
 }
 
-func (h *Heavy) factorial(x *big.Int) *big.Int {
+func (h *Heavy) factorial(ctx context.Context, x *big.Int) *big.Int {
+	ctx, span := beeline.StartSpan(ctx, "factorial")
+	defer span.Send()
+
+	beeline.AddField(ctx, "value", strconv.FormatInt(x.Int64(), 10))
+
 	n := big.NewInt(1)
 	if x.Cmp(big.NewInt(0)) == 0 {
 		return n
 	}
-	return n.Mul(x, h.factorial(n.Sub(x, n)))
+
+	return n.Mul(x, h.factorial(ctx, n.Sub(x, n)))
 }

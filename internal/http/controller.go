@@ -19,9 +19,10 @@ func NewController(service *service.Heavy) *Controler {
 	}
 }
 
+// SuperEndpoint does something great (calculates a Fibonacci number).
 func (c *Controler) SuperEndpoint(w http.ResponseWriter, r *http.Request) {
 
-	n := c.service.Compute()
+	n := c.service.Compute(r.Context())
 
 	json.NewEncoder(w).Encode(map[string]service.Result{"computed": n})
 	log.Println("request served")
