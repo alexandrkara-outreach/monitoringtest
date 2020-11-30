@@ -12,7 +12,7 @@ type Heavy struct {
 
 type Result struct {
 	Input     int      `json:"input"`
-	Factorial *big.Int `json:"fbactorial"`
+	Factorial *big.Int `json:"factorial"`
 }
 
 func NewHeavy(db *database.DB) *Heavy {
