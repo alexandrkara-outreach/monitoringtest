@@ -3,13 +3,18 @@ package database
 import (
 	"math/rand"
 	"time"
+
+	"github.com/alexandrkara-outreach/monitoringtest/internal/monitoring"
 )
 
 type DB struct {
+	stats *monitoring.Stats
 }
 
-func NewDB() *DB {
-	return &DB{}
+func NewDB(stats *monitoring.Stats) *DB {
+	return &DB{
+		stats: stats,
+	}
 }
 
 func (db *DB) Load() int {

@@ -4,10 +4,12 @@ import (
 	"math/big"
 
 	"github.com/alexandrkara-outreach/monitoringtest/internal/database"
+	"github.com/alexandrkara-outreach/monitoringtest/internal/monitoring"
 )
 
 type Heavy struct {
-	db *database.DB
+	db    *database.DB
+	stats *monitoring.Stats
 }
 
 type Result struct {
@@ -15,9 +17,10 @@ type Result struct {
 	Factorial *big.Int `json:"factorial"`
 }
 
-func NewHeavy(db *database.DB) *Heavy {
+func NewHeavy(db *database.DB, stats *monitoring.Stats) *Heavy {
 	return &Heavy{
-		db: db,
+		db:    db,
+		stats: stats,
 	}
 }
 
