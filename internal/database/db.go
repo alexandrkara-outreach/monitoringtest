@@ -7,7 +7,6 @@ import (
 
 	"github.com/honeycombio/beeline-go"
 
-	"github.com/alexandrkara-outreach/monitoringtest/internal/monitoring"
 	"github.com/alexandrkara-outreach/monitoringtest/internal/stats"
 )
 
