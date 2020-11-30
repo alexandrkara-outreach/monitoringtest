@@ -8,9 +8,9 @@ import (
 
 	"github.com/alexandrkara-outreach/monitoringtest/internal/database"
 	"github.com/alexandrkara-outreach/monitoringtest/internal/http"
-	"github.com/alexandrkara-outreach/monitoringtest/internal/monitoring"
 	"github.com/alexandrkara-outreach/monitoringtest/internal/service"
 	"github.com/alexandrkara-outreach/monitoringtest/internal/tracing"
+	"github.com/alexandrkara-outreach/monitoringtest/internal/stats"
 )
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 
 	tracing.AddCommonLibhoneyFields()
 
-	stats := monitoring.NewStats()
+	stats := stats.NewStats()
 
 	db := database.NewDB(stats)
 
@@ -37,7 +37,7 @@ func main() {
 
 	c := http.NewController(heavy)
 
-	router := http.CreateRouter(c)
+	router := http.CreateRouter(c, stats)
 	routerWithTracing := hnynethttp.WrapHandler(router)
 	http.RunServer(routerWithTracing)
 }

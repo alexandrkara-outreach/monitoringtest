@@ -8,12 +8,12 @@ import (
 	"github.com/honeycombio/beeline-go"
 
 	"github.com/alexandrkara-outreach/monitoringtest/internal/database"
-	"github.com/alexandrkara-outreach/monitoringtest/internal/monitoring"
+	"github.com/alexandrkara-outreach/monitoringtest/internal/stats"
 )
 
 type Heavy struct {
 	db    *database.DB
-	stats *monitoring.Stats
+	stats *stats.Stats
 }
 
 type Result struct {
@@ -21,7 +21,7 @@ type Result struct {
 	Factorial *big.Int `json:"factorial"`
 }
 
-func NewHeavy(db *database.DB, stats *monitoring.Stats) *Heavy {
+func NewHeavy(db *database.DB, stats *stats.Stats) *Heavy {
 	return &Heavy{
 		db:    db,
 		stats: stats,
@@ -32,6 +32,8 @@ func (h *Heavy) Compute(ctx context.Context) Result {
 	var r Result
 	r.Input = h.db.Load(ctx)
 	r.Factorial = h.factorial(ctx, big.NewInt(int64(r.Input)))
+
+	h.stats.Gauge("service.factorial", float64(r.Input), []string{"name:Heavy.Compute"})
 	return r
 }
 

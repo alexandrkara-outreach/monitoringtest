@@ -8,14 +8,15 @@ import (
 	"github.com/honeycombio/beeline-go"
 
 	"github.com/alexandrkara-outreach/monitoringtest/internal/monitoring"
+	"github.com/alexandrkara-outreach/monitoringtest/internal/stats"
 )
 
 // A fake database.
 type DB struct {
-	stats *monitoring.Stats
+	stats *stats.Stats
 }
 
-func NewDB(stats *monitoring.Stats) *DB {
+func NewDB(stats *stats.Stats) *DB {
 	return &DB{
 		stats: stats,
 	}
@@ -27,7 +28,16 @@ func (db *DB) Load(ctx context.Context) int {
 	ctx, span := beeline.StartSpan(ctx, "loading")
 	defer span.Send()
 
-	n := rand.Intn(100)
+	db.stats.Count("database.query", 1, []string{"name:load"})
+
+	var n int
+
+	db.stats.Measure("database.latency", []string{"name:load"}, func() {
+		n = rand.Intn(100)
+		time.Sleep(time.Duration(10*n) * time.Millisecond)
+	})
+
 	time.Sleep(time.Duration(10*n) * time.Millisecond)
+
 	return n
 }
