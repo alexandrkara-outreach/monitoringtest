@@ -1,10 +1,14 @@
 version: '3'
 services:
   datadog:
+    ports:
+      - "8125:8125/udp"
     image: gcr.io/datadoghq/agent:latest
     environment:
      - DD_API_KEY=${DD_API_KEY}
-     - DD_SITE=${DD_SITE}
+     - DD_SITE=datadoghq.eu
+     - DD_DOGSTATSD_PORT=8125
+     - DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true
     volumes:
      - /var/run/docker.sock:/var/run/docker.sock
      - /proc/:/host/proc/:ro
