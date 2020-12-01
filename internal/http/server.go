@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -14,5 +15,8 @@ func RunServer(router http.Handler) {
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
+
+	fmt.Printf("Running server on '%s'\n", srv.Addr)
+
 	log.Fatal(srv.ListenAndServe())
 }

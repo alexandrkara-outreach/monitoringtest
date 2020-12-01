@@ -1,8 +1,12 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"math/big"
+	"strconv"
+
+	"github.com/honeycombio/beeline-go"
 
 	"github.com/alexandrkara-outreach/monitoringtest/internal/database"
 	"github.com/alexandrkara-outreach/monitoringtest/internal/stats"
@@ -26,7 +30,7 @@ func NewHeavy(db *database.DB, stats *stats.Stats) *Heavy {
 	}
 }
 
-func (h *Heavy) Compute() (Result, error) {
+func (h *Heavy) Compute(ctx context.Context) (Result, error) {
 	var (
 		r   Result
 		err error
@@ -37,32 +41,38 @@ func (h *Heavy) Compute() (Result, error) {
 	}
 
 	if util.Lucky(0.5) {
-		if _, err = h.db.Query("query_random1", 25); err != nil {
+		if _, err = h.db.Query(ctx, "query_random1", 25); err != nil {
 			return r, err
 		}
 	}
 
 	if util.Lucky(0.3) {
-		if _, err = h.db.Query("query_random2", 50); err != nil {
+		if _, err = h.db.Query(ctx, "query_random2", 50); err != nil {
 			return r, err
 		}
 	}
 
-	if r.Input, err = h.db.Query("query_input", 5); err != nil {
+	if r.Input, err = h.db.Query(ctx, "query_input", 5); err != nil {
 		return r, err
 	}
 
-	r.Factorial = h.factorial(big.NewInt(int64(r.Input)))
+	r.Factorial = h.factorial(ctx, big.NewInt(int64(r.Input)))
 
 	h.stats.Gauge("service.factorial", float64(r.Input), []string{"name:Heavy.Compute"})
 
 	return r, nil
 }
 
-func (h *Heavy) factorial(x *big.Int) *big.Int {
+func (h *Heavy) factorial(ctx context.Context, x *big.Int) *big.Int {
+	ctx, span := beeline.StartSpan(ctx, "factorial")
+	defer span.Send()
+
+	beeline.AddField(ctx, "value", strconv.FormatInt(x.Int64(), 10))
+
 	n := big.NewInt(1)
 	if x.Cmp(big.NewInt(0)) == 0 {
 		return n
 	}
-	return n.Mul(x, h.factorial(n.Sub(x, n)))
+
+	return n.Mul(x, h.factorial(ctx, n.Sub(x, n)))
 }

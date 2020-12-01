@@ -7,24 +7,11 @@ import (
 	"time"
 
 	"github.com/DataDog/datadog-go/statsd"
+	"github.com/alexandrkara-outreach/monitoringtest/internal/util"
 )
 
 type Stats struct {
 	client *statsd.Client
-}
-
-type loggingResponseWriter struct {
-	http.ResponseWriter
-	statusCode int
-}
-
-func NewLoggingResponseWriter(w http.ResponseWriter) *loggingResponseWriter {
-	return &loggingResponseWriter{w, http.StatusOK}
-}
-
-func (lrw *loggingResponseWriter) WriteHeader(code int) {
-	lrw.statusCode = code
-	lrw.ResponseWriter.WriteHeader(code)
 }
 
 func NewStats() *Stats {
@@ -44,9 +31,9 @@ func NewStats() *Stats {
 func (s *Stats) RecordHTTP(name string, handler func(http.ResponseWriter, *http.Request)) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		t := time.Now()
-		lw := NewLoggingResponseWriter(w)
+		lw := util.NewLoggingResponseWriter(w)
 		handler(lw, r)
-		status := strconv.Itoa(lw.statusCode/100) + "XX"
+		status := strconv.Itoa(lw.StatusCode/100) + "XX"
 		s.Histogram("http.request", float64(time.Since(t).Milliseconds()), []string{"endpoint:" + name, "status:" + status})
 		log.Printf("msg:request served status:%s\n", status)
 	}

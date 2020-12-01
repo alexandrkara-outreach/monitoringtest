@@ -20,8 +20,9 @@ func NewController(service *service.Heavy, stats *stats.Stats) *Controler {
 	}
 }
 
+// SuperEndpoint does something great (calculates a Fibonacci number).
 func (c *Controler) SuperEndpoint(w http.ResponseWriter, r *http.Request) {
-	n, err := c.service.Compute()
+	n, err := c.service.Compute(r.Context())
 
 	if err != nil {
 		c.stats.RecordError(err)
