@@ -34,7 +34,7 @@ func (s *Stats) RecordHTTP(name string, handler func(http.ResponseWriter, *http.
 		lw := util.NewLoggingResponseWriter(w)
 		handler(lw, r)
 		status := strconv.Itoa(lw.StatusCode/100) + "XX"
-		s.Histogram("http.request", float64(time.Since(t).Milliseconds()), []string{"endpoint:" + name, "status:" + status})
+		s.Timing("http.request", time.Since(t), []string{"endpoint:" + name, "status:" + status})
 		log.Printf("msg:request served status:%s\n", status)
 	}
 }
@@ -42,7 +42,7 @@ func (s *Stats) RecordHTTP(name string, handler func(http.ResponseWriter, *http.
 func (s *Stats) Measure(name string, tags []string, callback func()) {
 	t := time.Now()
 	callback()
-	s.Histogram(name, float64(time.Since(t).Milliseconds()), tags)
+	s.Timing(name, time.Since(t), tags)
 }
 
 func (s *Stats) Gauge(name string, value float64, tags []string) {
@@ -61,6 +61,13 @@ func (s *Stats) Count(name string, value int64, tags []string) {
 
 func (s *Stats) Histogram(name string, value float64, tags []string) {
 	err := s.client.Histogram(name, value, tags, 1.0)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (s *Stats) Timing(name string, value time.Duration, tags []string) {
+	err := s.client.Timing(name, value, tags, 1.0)
 	if err != nil {
 		panic(err)
 	}
