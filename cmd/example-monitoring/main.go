@@ -35,7 +35,7 @@ func main() {
 
 	heavy := service.NewHeavy(db, stats)
 
-	c := http.NewController(heavy)
+	c := http.NewController(heavy, stats)
 
 	router := http.CreateRouter(c, stats)
 	routerWithTracing := hnynethttp.WrapHandler(router)
