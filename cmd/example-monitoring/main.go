@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 
 	beeline "github.com/honeycombio/beeline-go"
@@ -17,7 +18,7 @@ func main() {
 	// Configure Honeycomb. In reality, the key shouldn't be hardcoded.
 	honeycombWriteKey := os.Getenv("HONEYCOMB_WRITEKEY")
 	if honeycombWriteKey == "" {
-		honeycombWriteKey = "44f82e3dcff4d8bd02ce2271a6be7c03"
+		log.Error("You need to provide a Honeycomb key in HONEYCOMB_WRITEKEY variable")
 	}
 	beeline.Init(beeline.Config{
 		WriteKey:    honeycombWriteKey,
