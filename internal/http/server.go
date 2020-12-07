@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// RunServer is the main entry to the service, runs a HTTP server.
 func RunServer(router http.Handler) {
 	srv := &http.Server{
 		Handler: router,

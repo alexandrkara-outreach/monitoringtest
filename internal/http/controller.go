@@ -8,11 +8,13 @@ import (
 	"github.com/alexandrkara-outreach/monitoringtest/internal/stats"
 )
 
+// Controller captures the main service with additional utilities (e.g. stats).
 type Controler struct {
 	service *service.Heavy
 	stats   *stats.Stats
 }
 
+// NewController creates a new Controller instance.
 func NewController(service *service.Heavy, stats *stats.Stats) *Controler {
 	return &Controler{
 		service: service,

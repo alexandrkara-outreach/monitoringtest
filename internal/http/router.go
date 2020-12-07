@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// CreateRouter creates HTTP endpoints for health checking and for "SuperEndpoint".
 func CreateRouter(c *Controler, stats *stats.Stats) http.Handler {
 	router := mux.NewRouter()
 
