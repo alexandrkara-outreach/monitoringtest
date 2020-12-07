@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/alexandrkara-outreach/monitoringtest/internal/stats"
-	"github.com/alexandrkara-outreach/monitoringtest/internal/tracing"
 	"github.com/gorilla/mux"
 )
 
@@ -21,7 +20,6 @@ func CreateRouter(c *Controler, stats *stats.Stats) http.Handler {
 	// Apply metric and tracing "middlewares"
 	superEndpoint := c.SuperEndpoint
 	superEndpoint = stats.RecordHTTP("GET-/super/endpoint", superEndpoint)
-	superEndpoint = tracing.RecordHTTP(superEndpoint)
 	router.HandleFunc("/super/endpoint", superEndpoint)
 
 	return router

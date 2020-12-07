@@ -34,11 +34,11 @@ func (db *DB) Query(ctx context.Context, name string, n int) (r int, err error) 
 		span.Send()
 	}()
 
+	span.AddField("query_name", name)
+
 	if util.Lucky(0.1) {
 		return 0, errors.New("query." + name)
 	}
-
-	span.AddField("query_name", name)
 
 	db.stats.Count("database.query", 1, []string{"name:load"})
 

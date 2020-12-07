@@ -53,7 +53,7 @@ func (h *Heavy) Compute(ctx context.Context) (Result, error) {
 		}
 	}
 
-	if r.Input, err = h.db.Query(ctx, "query_input", 20); err != nil {
+	if r.Input, err = h.db.Query(ctx, "query_input", 10); err != nil {
 		return r, err
 	}
 
