@@ -23,7 +23,7 @@ func NewDB(stats *stats.Stats) *DB {
 	}
 }
 
-// Load loads a number from a fake database.
+// Query loads a number from a fake database.
 // Normally, we would propagate the trace ID to the database.
 func (db *DB) Query(ctx context.Context, name string, n int) (r int, err error) {
 	ctx, span := beeline.StartSpan(ctx, "query")

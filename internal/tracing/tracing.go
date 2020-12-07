@@ -10,8 +10,8 @@ import (
 	"github.com/honeycombio/libhoney-go"
 )
 
+// AddCommonLibhoneyFields adds some dynamic generally useful fields to the current trace.
 func AddCommonLibhoneyFields() {
-	// TODO what other fields should we add here for extra color?
 	libhoney.AddDynamicField("meta.num_goroutines",
 		func() interface{} { return runtime.NumGoroutine() })
 	getAlloc := func() interface{} {
@@ -27,11 +27,13 @@ func AddCommonLibhoneyFields() {
 	})
 }
 
+// ShouldSample returns whether the current trace should be included in a sample.
 func ShouldSample(fields map[string]interface{}) (bool, int) {
 	// Sample 10% of requests by default.
 	return true, 10
 }
 
+// RecordHTTP adds a span around an incoming HTTP request.
 func RecordHTTP(handler func(http.ResponseWriter, *http.Request)) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx, span := beeline.StartSpan(r.Context(), "http.request")

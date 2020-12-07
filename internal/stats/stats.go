@@ -10,10 +10,12 @@ import (
 	"github.com/alexandrkara-outreach/monitoringtest/internal/util"
 )
 
+// Stats represents a connection to a statistics collection daemon.
 type Stats struct {
 	client *statsd.Client
 }
 
+// NewStats creates a connection to a statistics collection daemon and returns a Stats object.
 func NewStats() *Stats {
 	statsd, err := statsd.New("127.0.0.1:8125")
 
@@ -28,6 +30,7 @@ func NewStats() *Stats {
 	}
 }
 
+// RecordHTTP wraps a HTTP incoming request handler with code to send statistics.
 func (s *Stats) RecordHTTP(name string, handler func(http.ResponseWriter, *http.Request)) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		t := time.Now()
@@ -39,12 +42,14 @@ func (s *Stats) RecordHTTP(name string, handler func(http.ResponseWriter, *http.
 	}
 }
 
+// Measure records a timing of executing 'callback'.
 func (s *Stats) Measure(name string, tags []string, callback func()) {
 	t := time.Now()
 	callback()
 	s.Timing(name, time.Since(t), tags)
 }
 
+// Gauge records a snapshot of a value (not monononic in general).
 func (s *Stats) Gauge(name string, value float64, tags []string) {
 	err := s.client.Gauge(name, value, tags, 1.0)
 	if err != nil {
@@ -52,6 +57,7 @@ func (s *Stats) Gauge(name string, value float64, tags []string) {
 	}
 }
 
+// Count records the current value of a counter (monotonically increasing).
 func (s *Stats) Count(name string, value int64, tags []string) {
 	err := s.client.Count(name, value, tags, 1.0)
 	if err != nil {
@@ -59,6 +65,7 @@ func (s *Stats) Count(name string, value int64, tags []string) {
 	}
 }
 
+// Histogram is similar to Gauge but it's useful when you want to aggregate value ranges into buckets.
 func (s *Stats) Histogram(name string, value float64, tags []string) {
 	err := s.client.Histogram(name, value, tags, 1.0)
 	if err != nil {
@@ -66,6 +73,7 @@ func (s *Stats) Histogram(name string, value float64, tags []string) {
 	}
 }
 
+// Timing records a time duration value.
 func (s *Stats) Timing(name string, value time.Duration, tags []string) {
 	err := s.client.Timing(name, value, tags, 1.0)
 	if err != nil {
@@ -73,6 +81,7 @@ func (s *Stats) Timing(name string, value time.Duration, tags []string) {
 	}
 }
 
+// RecordError records when an error occurrs.
 func (s *Stats) RecordError(err error) {
 	s.Count("errors", 1, []string{"error:" + err.Error()})
 }
